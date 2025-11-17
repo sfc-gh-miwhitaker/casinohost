@@ -1,0 +1,165 @@
+name: Casino Host Intelligence
+description: Semantic model powering casino host guidance, churn insights, and comp recommendations.
+
+tables:
+  - name: DIM_PLAYER
+    description: Player master dimension with demographics, loyalty, and lifetime performance.
+    base_table: SNOWFLAKE_EXAMPLE.ANALYTICS_LAYER.DIM_PLAYER
+    dimensions:
+      - name: player_id
+        synonyms: [customer id, patron id, member id]
+        description: Unique player identifier
+      - name: player_tier
+        synonyms: [tier, level, status, membership level]
+        description: Current loyalty tier (Bronze/Silver/Gold/Platinum/Diamond)
+      - name: home_state
+        synonyms: [state, region]
+        description: Player home state
+      - name: favorite_game_type
+        synonyms: [preferred game, favorite game]
+        description: Predominant game category for the player
+    measures:
+      - name: total_theoretical_amount
+        synonyms: [lifetime theoretical, total theo]
+        description: Lifetime theoretical win attributed to the player
+        aggregation: SUM
+      - name: total_wagered_amount
+        synonyms: [lifetime wagered, money in]
+        description: Lifetime amount wagered across all sessions
+        aggregation: SUM
+      - name: total_sessions
+        synonyms: [visits, session count]
+        description: Total number of sessions recorded for the player
+        aggregation: SUM
+
+  - name: V_PLAYER_FEATURES
+    description: ML-ready feature set capturing recency, frequency, and monetary behavior.
+    base_table: SNOWFLAKE_EXAMPLE.ANALYTICS_LAYER.V_PLAYER_FEATURES
+    measures:
+      - name: days_since_last_session
+        synonyms: [days since visit, inactivity]
+        description: Days since the player last visited
+        aggregation: MIN
+      - name: sessions_last_30d
+        synonyms: [30 day visits, monthly visits]
+        description: Session count in the past 30 days
+        aggregation: SUM
+      - name: total_wagered_last_30d
+        synonyms: [recent spend, 30 day wagered]
+        description: Total wagered amount in the past 30 days
+        aggregation: SUM
+      - name: host_touches_last_30d
+        synonyms: [host interactions, host engagements]
+        description: Count of host interactions in the past 30 days
+        aggregation: SUM
+
+  - name: V_PLAYER_CHURN_SCORES
+    description: Churn probability scores generated via Cortex ML classification model.
+    base_table: SNOWFLAKE_EXAMPLE.ANALYTICS_LAYER.V_PLAYER_CHURN_SCORES
+    measures:
+      - name: churn_probability
+        synonyms: [churn risk, probability of churn]
+        description: Probability (0-1) that player will churn
+        aggregation: AVG
+      - name: churn_risk_segment
+        synonyms: [risk category, risk level]
+        description: Risk label for host prioritization
+        aggregation: NONE
+
+  - name: V_PLAYER_LTV_SCORES
+    description: RFM-based lifetime value scoring with quintile segmentation.
+    base_table: SNOWFLAKE_EXAMPLE.ANALYTICS_LAYER.V_PLAYER_LTV_SCORES
+    measures:
+      - name: ltv_score
+        synonyms: [lifetime value score, rfm score]
+        description: Weighted RFM score (1-5 scale)
+        aggregation: AVG
+      - name: ltv_segment
+        synonyms: [ltv bucket, value tier]
+        description: Segment classification (VIP/High Value/Growth/Core/Dormant)
+        aggregation: NONE
+
+  - name: V_PLAYER_RECOMMENDATIONS
+    description: Next-best-action recommendations and suggested comp values for hosts.
+    base_table: SNOWFLAKE_EXAMPLE.ANALYTICS_LAYER.V_PLAYER_RECOMMENDATIONS
+    dimensions:
+      - name: recommended_action
+        synonyms: [suggested action, guidance]
+        description: Primary action host should take for the player
+      - name: recommendation_reason
+        synonyms: [rationale, explanation]
+        description: Business rationale behind the recommendation
+    measures:
+      - name: suggested_comp_value_usd
+        synonyms: [comp amount, comp value]
+        description: Recommended complimentary offer amount in USD
+        aggregation: AVG
+
+relationships:
+  - left_table: V_PLAYER_FEATURES
+    left_column: player_id
+    right_table: DIM_PLAYER
+    right_column: player_id
+    type: many_to_one
+  - left_table: V_PLAYER_CHURN_SCORES
+    left_column: player_id
+    right_table: DIM_PLAYER
+    right_column: player_id
+    type: one_to_one
+  - left_table: V_PLAYER_LTV_SCORES
+    left_column: player_id
+    right_table: DIM_PLAYER
+    right_column: player_id
+    type: one_to_one
+  - left_table: V_PLAYER_RECOMMENDATIONS
+    left_column: player_id
+    right_table: DIM_PLAYER
+    right_column: player_id
+    type: one_to_one
+
+verified_queries:
+  - question: Which players should I offer comps to right now?
+    sql: |
+      SELECT
+          p.player_id,
+          p.player_tier,
+          r.recommended_action,
+          r.suggested_comp_value_usd
+      FROM SNOWFLAKE_EXAMPLE.ANALYTICS_LAYER.V_PLAYER_RECOMMENDATIONS r
+      JOIN SNOWFLAKE_EXAMPLE.ANALYTICS_LAYER.DIM_PLAYER p
+        ON r.player_id = p.player_id
+      WHERE r.suggested_comp_value_usd > 0
+      ORDER BY r.suggested_comp_value_usd DESC
+      LIMIT 25;
+
+  - question: Show me high-value players at risk of churning?
+    sql: |
+      SELECT
+          p.player_id,
+          p.player_tier,
+          c.churn_probability,
+          l.ltv_segment,
+          f.days_since_last_session,
+          f.total_wagered_last_30d
+      FROM SNOWFLAKE_EXAMPLE.ANALYTICS_LAYER.V_PLAYER_CHURN_SCORES c
+      JOIN SNOWFLAKE_EXAMPLE.ANALYTICS_LAYER.V_PLAYER_LTV_SCORES l
+        ON c.player_id = l.player_id
+      JOIN SNOWFLAKE_EXAMPLE.ANALYTICS_LAYER.V_PLAYER_FEATURES f
+        ON c.player_id = f.player_id
+      JOIN SNOWFLAKE_EXAMPLE.ANALYTICS_LAYER.DIM_PLAYER p
+        ON c.player_id = p.player_id
+      WHERE l.ltv_segment IN ('VIP','High Value')
+        AND c.churn_probability >= 0.6
+      ORDER BY c.churn_probability DESC
+      LIMIT 25;
+
+  - question: What comp amount should I offer to player 12345?
+    sql: |
+      SELECT
+          r.player_id,
+          r.suggested_comp_value_usd,
+          r.recommended_action,
+          r.recommendation_reason
+      FROM SNOWFLAKE_EXAMPLE.ANALYTICS_LAYER.V_PLAYER_RECOMMENDATIONS r
+      WHERE r.player_id = 12345;
+
