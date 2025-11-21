@@ -1,15 +1,21 @@
 # Data Flow - Casino Host Intelligence
 Author: Michael Whitaker  
-Last Updated: 2025-11-17  
+Last Updated: 2025-11-21  
 Status: Reference Impl  
 ![Snowflake](https://img.shields.io/badge/Snowflake-29B5E8?style=for-the-badge&logo=snowflake&logoColor=white)  
 Reference Impl: This code demonstrates prod-grade architectural patterns and best practice. review and customize security, networking, logic for your organization's specific requirements before deployment.
 
 ## Overview
-End-to-end journey of synthetic casino data from raw generation through staging, analytics modeling, ML feature creation, and Cortex Analyst consumption supporting casino host decisions.
+End-to-end journey of synthetic casino data from Git-integrated deployment through raw generation, staging transformations, analytics modeling, ML feature creation, and Cortex Analyst consumption supporting casino host decisions. Deployment via `sql/00_deploy_all.sql` orchestrates all phases using `EXECUTE IMMEDIATE FROM` Git repository pattern.
 
 ```mermaid
 graph TB
+    subgraph "Deployment"
+        GIT_REPO[GitHub Repository<br/>sfc-gh-miwhitaker/casinohost]
+        DEPLOY_SCRIPT[sql/00_deploy_all.sql<br/>Copy/Paste to Snowsight]
+        GIT_STAGE[@GIT_REPOS.CASINOHOST_REPO<br/>EXECUTE IMMEDIATE FROM]
+    end
+
     subgraph "Generation"
         GEN_PLAYERS[SQL Generator<br/>Players]
         GEN_GAMES[SQL Generator<br/>Games]
@@ -53,6 +59,14 @@ graph TB
         HOST_UI[Host Experience]
     end
 
+    GIT_REPO --> DEPLOY_SCRIPT
+    DEPLOY_SCRIPT --> GIT_STAGE
+    GIT_STAGE -.EXECUTE IMMEDIATE FROM.-> GEN_PLAYERS
+    GIT_STAGE -.EXECUTE IMMEDIATE FROM.-> GEN_GAMES
+    GIT_STAGE -.EXECUTE IMMEDIATE FROM.-> GEN_SESSIONS
+    GIT_STAGE -.EXECUTE IMMEDIATE FROM.-> GEN_TXNS
+    GIT_STAGE -.EXECUTE IMMEDIATE FROM.-> GEN_COMPS
+
     GEN_PLAYERS --> RAW_PLAYERS
     GEN_GAMES --> RAW_GAMES
     GEN_SESSIONS --> RAW_SESSIONS
@@ -83,6 +97,27 @@ graph TB
 ```
 
 ## Component Descriptions
+
+### Deployment Layer
+- **GitHub Repository** - Public repository hosting all SQL scripts
+  - Purpose: Single source of truth for deployment code
+  - Technology: GitHub public repository
+  - Location: `https://github.com/sfc-gh-miwhitaker/casinohost`
+  - Access: Public, no authentication required
+
+- **sql/00_deploy_all.sql** - Primary deployment script
+  - Purpose: Copy/paste into Snowsight for one-click deployment
+  - Technology: SQL with Git integration via `EXECUTE IMMEDIATE FROM`
+  - Location: `sql/00_deploy_all.sql` in repository
+  - Pattern: Creates API integration, Git repo stage, then orchestrates all 30 SQL scripts
+  - Runtime: ~35 minutes, ~$0.50 cost
+
+- **@GIT_REPOS.CASINOHOST_REPO** - Git repository stage in Snowflake
+  - Purpose: Mount GitHub repository as Snowflake stage for script execution
+  - Technology: Snowflake Git Repository object with API Integration
+  - Location: `SNOWFLAKE_EXAMPLE.GIT_REPOS.CASINOHOST_REPO`
+  - Pattern: `EXECUTE IMMEDIATE FROM @stage/branches/main/sql/...`
+  - Deps: `SFE_CASINOHOST_GIT_INTEGRATION` API integration
 - Synthetic Generators  
   - Purpose: Generate statistically realistic casino demo data  
   - Technology: Snowflake SQL (`TABLE(GENERATOR())`, random functions)  
