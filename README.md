@@ -78,28 +78,44 @@ This demo showcases how casino operators can leverage Snowflake's Data Cloud, Co
 - **Architecture diagrams**: Data flow, network flow, authentication flow (Mermaid format)
 
 ### 8. Deployment Automation
-- **Cross-platform scripts** (.sh + .bat): 5 numbered scripts for setup → validation
-- **Estimated deployment time**: 35 minutes (automated) to working demo
-- **Rollback plan**: Complete teardown script preserving SNOWFLAKE_EXAMPLE DB
+- **Primary method**: `sql/00_deploy_all.sql` – Single script for Snowsight copy/paste deployment
+- **Git-integrated**: Uses `EXECUTE IMMEDIATE FROM @git_repo` for native Snowflake execution
+- **Estimated deployment time**: 35 minutes automated to working demo
+- **Rollback plan**: `sql/99_cleanup/teardown_all.sql` – Complete teardown preserving SNOWFLAKE_EXAMPLE DB
 - **Cleanup validation**: Verify all demo objects removed safely
 
 ---
 
 ## 👋 First Time Here?
 
-Follow these items in order:
+### 🚀 Quickest Path (5 minutes to deploy)
 
-1. `docs/01-SETUP.md` – Environment prerequisites and Snowflake configuration (5 min)
-2. `tools/01_setup.sh` – Provision demo warehouse, roles, and schemas
-3. `docs/02-DEPLOYMENT.md` – Deploy synthetic data, transforms, and ML models (10 min)
-4. `tools/02_generate_data.sh` – Generate casino synthetic datasets
-5. `tools/03_deploy_ml.sh` – Build analytics layer and ML scoring artifacts
-6. `tools/04_deploy_semantic_model.sh` – Publish semantic model and Cortex Analyst agent
-7. `docs/03-USAGE.md` – Operate the demo and run Cortex Analyst scenarios (10 min)
-8. `docs/04-ARCHITECTURE.md` – Understand design decisions and validation checks (10 min)
-9. `tools/05_validate.sh` – Optional full pipeline + pytest validation (10 min)
+**PRIMARY METHOD:** One-Script Deployment (100% Snowflake Native)
 
-**Total setup time:** ~35 minutes
+1. Open **Snowsight** (your Snowflake web interface)
+2. Copy the entire **`sql/00_deploy_all.sql`** script
+3. Paste into a **new Snowsight worksheet**
+4. Click **"Run All"** button (top right)
+5. Wait **~35 minutes** for automated deployment
+
+**That's it!** Everything deploys via Git integration:
+- ✅ Infrastructure (warehouse, database, schemas, roles)
+- ✅ Synthetic data (50K players, 2M sessions, 10M transactions)
+- ✅ Dimensional model (star schema with dimensions/facts)
+- ✅ ML models (churn classification, LTV scoring, recommendations)
+- ✅ Cortex Analyst (semantic model for natural language queries)
+
+### 📚 Alternative: Step-by-Step with Documentation
+
+If you prefer to understand each component:
+
+1. `docs/01-SETUP.md` – Prerequisites and Snowflake configuration (5 min)
+2. `docs/02-DEPLOYMENT.md` – Detailed deployment walkthrough (10 min)
+3. `docs/03-USAGE.md` – Demo script with 5 personas (15 min)
+4. `docs/04-ARCHITECTURE.md` – Technical deep dive (10 min)
+5. `docs/05-INDUSTRY-VALIDATION.md` – Real-world alignment validation
+
+**Total setup time:** ~35 minutes (automated) or ~45 minutes (manual step-by-step)
 
 ---
 
