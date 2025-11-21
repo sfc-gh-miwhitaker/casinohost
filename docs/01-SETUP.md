@@ -15,7 +15,7 @@ Estimated time: 5 minutes
 1. **Clone repository**  
    ```bash
    git clone https://github.com/your-org/casinohost.git
-   cd casinhost
+   cd casinohost
    ```
 
 2. **Configure Python environment**  
