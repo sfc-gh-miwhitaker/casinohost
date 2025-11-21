@@ -32,9 +32,10 @@ Document technical decisions, validation checkpoints, and real-world alignment f
 - Scripts idempotent—safe to re-run without additional storage growth.
 
 ## Testing & Monitoring Hooks
-- Data quality tests in `python/tests/` (row counts, referential integrity, distribution checks).  
-- ML validation placeholders ensure churn model accuracy ≥75% before showcasing.  
-- Diagnostics queries (under `sql/99_cleanup/validate_cleanup.sql`) review credit usage and storage footprint.
+- Data quality validation built into SQL scripts (row counts, referential integrity, distribution checks)
+- ML validation ensures churn model accuracy ≥75% before showcasing
+- Diagnostics queries (under `sql/99_cleanup/validate_cleanup.sql`) review credit usage and storage footprint
+- Industry benchmark validation queries in `docs/05-INDUSTRY-VALIDATION.md`
 
 ## Future Enhancements
 - Integrate near-real-time streaming via Snowpipe Streaming for live session updates.  

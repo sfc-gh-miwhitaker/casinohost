@@ -22,7 +22,7 @@ sequenceDiagram
 
     Note over User,Snowflake: Phase 1: Git-Integrated Deployment
     User->>Snowsight: Login via SSO/OAuth (ACCOUNTADMIN)
-    User->>Snowsight: Copy/paste sql/00_deploy_all.sql
+    User->>Snowsight: Copy/paste deploy_all.sql
     User->>Snowsight: Click "Run All"
     
     Snowsight->>Snowflake: CREATE API INTEGRATION (Git HTTPS access)
@@ -59,7 +59,7 @@ sequenceDiagram
 
 ### Deployment Components
 - **User (ACCOUNTADMIN)**  
-  - Purpose: Deploy demo via Snowsight using `sql/00_deploy_all.sql`  
+  - Purpose: Deploy demo via Snowsight using `deploy_all.sql`  
   - Technology: Snowflake RBAC, SSO/OAuth or key-pair authentication  
   - Location: `ACCOUNTADMIN` context during deployment  
   - Deps: Master Snowflake account access, network access to GitHub
@@ -68,7 +68,7 @@ sequenceDiagram
   - Purpose: Primary deployment interface for copy/paste workflow  
   - Technology: Snowflake web interface (HTTPS 443)  
   - Location: Browser-based, `<account>.snowflakecomputing.com`  
-  - Workflow: Copy entire `sql/00_deploy_all.sql` → Paste → Click "Run All"
+  - Workflow: Copy entire `deploy_all.sql` → Paste → Click "Run All"
 
 - **GitHub Repository**  
   - Purpose: Host all SQL scripts for Git-integrated deployment  

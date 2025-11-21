@@ -1,11 +1,12 @@
 # Data Model - Casino Host Intelligence
 
-**Author:** Michael Whitaker  
-**Last Updated:** 2025-11-17  
-**Status:** Reference Impl  
+Author: Michael Whitaker  
+Last Updated: 2025-11-21  
+Status: Reference Impl
+
 ![Snowflake](https://img.shields.io/badge/Snowflake-29B5E8?style=for-the-badge&logo=snowflake&logoColor=white)
 
-**Reference Impl:** This code demonstrates prod-grade architectural patterns and best practice. Review and customize security, networking, logic for your organization's specific requirements before deployment.
+Reference Impl: This code demonstrates prod-grade architectural patterns and best practice. review and customize security, networking, logic for your organization's specific requirements before deployment.
 
 ## Overview
 

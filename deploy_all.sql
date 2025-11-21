@@ -219,13 +219,15 @@ NEXT STEPS:
    - Try: "Show me high-value players at risk of churning"
 
 2. Query the analytics layer:
-   SELECT * FROM SNOWFLAKE_EXAMPLE.ANALYTICS_LAYER.V_PLAYER_RECOMMENDATIONS LIMIT 25;
+   SELECT player_id, player_name, loyalty_tier, churn_probability, suggested_action, suggested_comp_value_usd
+   FROM SNOWFLAKE_EXAMPLE.ANALYTICS_LAYER.V_PLAYER_RECOMMENDATIONS 
+   LIMIT 25;
 
 3. Review demo scenarios:
    See docs/03-USAGE.md for complete demo script with 5 personas
 
-4. Run validation tests:
-   pytest python/tests -v (requires Python environment setup)
+4. Run validation queries:
+   See docs/05-INDUSTRY-VALIDATION.md for industry benchmark validation queries
 
 5. Cleanup when done:
    Run sql/99_cleanup/teardown_all.sql to remove all demo objects

@@ -77,7 +77,7 @@ graph TB
 
 ### Client Layer
 - **Snowsight UI**  
-  - Purpose: Primary deployment interface via copy/paste of `sql/00_deploy_all.sql`  
+  - Purpose: Primary deployment interface via copy/paste of `deploy_all.sql`  
   - Technology: Snowflake web interface (HTTPS 443)  
   - Location: `<account>.snowflakecomputing.com`  
   - Deps: ACCOUNTADMIN role for initial deployment

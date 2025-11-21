@@ -64,10 +64,10 @@ This demo showcases how casino operators can leverage Snowflake's Data Cloud, Co
 - **Industry validation**: All metrics aligned to casino industry standards (ADT, comp %, churn definition)
 
 ### 6. Comprehensive Testing & Validation
-- **14 integration tests** (pytest): Data quality, ML validation, Cortex queries, E2E pipeline
 - **Industry benchmark validation**: 12 categories of real-world alignment
 - **Persona discovery queries**: Validate all 5 archetypes exist in generated data
 - **Cross-platform scripts**: Automated deployment and validation for macOS/Linux/Windows
+- **Data quality checks**: Built into SQL scripts with validation queries
 
 ### 7. Complete Documentation Suite
 - **01-SETUP.md**: Environment prerequisites and Snowflake configuration
@@ -78,7 +78,7 @@ This demo showcases how casino operators can leverage Snowflake's Data Cloud, Co
 - **Architecture diagrams**: Data flow, network flow, authentication flow (Mermaid format)
 
 ### 8. Deployment Automation
-- **Primary method**: `sql/00_deploy_all.sql` – Single script for Snowsight copy/paste deployment
+- **Primary method**: `deploy_all.sql` – Single script for Snowsight copy/paste deployment (project root)
 - **Git-integrated**: Uses `EXECUTE IMMEDIATE FROM @git_repo` for native Snowflake execution
 - **Estimated deployment time**: 35 minutes automated to working demo
 - **Rollback plan**: `sql/99_cleanup/teardown_all.sql` – Complete teardown preserving SNOWFLAKE_EXAMPLE DB
@@ -86,14 +86,14 @@ This demo showcases how casino operators can leverage Snowflake's Data Cloud, Co
 
 ---
 
-## 👋 First Time Here?
+## First Time Here?
 
-### 🚀 Quickest Path (5 minutes to deploy)
+### Quickest Path (5 minutes to deploy)
 
 **PRIMARY METHOD:** One-Script Deployment (100% Snowflake Native)
 
 1. Open **Snowsight** (your Snowflake web interface)
-2. Copy the entire **`sql/00_deploy_all.sql`** script
+2. Copy the entire **`deploy_all.sql`** script (from project root)
 3. Paste into a **new Snowsight worksheet**
 4. Click **"Run All"** button (top right)
 5. Wait **~35 minutes** for automated deployment
@@ -201,44 +201,11 @@ See `docs/05-INDUSTRY-VALIDATION.md` for complete validation across 12 categorie
 
 ---
 
-## 🚀 Quick Start (5 minutes to running demo)
-
-```bash
-# 1. Clone and navigate
-cd /path/to/casinohost
-
-# 2. Set up Python environment
-python -m venv venv
-source venv/bin/activate  # macOS/Linux
-# venv\Scripts\activate   # Windows
-pip install -r python/requirements.txt
-
-# 3. Configure Snowflake connection
-# Set environment variables or use Snow CLI default connection
-
-# 4. Deploy everything (35 minutes automated)
-./tools/01_setup.sh
-./tools/02_generate_data.sh
-./tools/03_deploy_ml.sh
-./tools/04_deploy_semantic_model.sh
-
-# 5. Test Cortex Analyst
-# Query via Snowsight or SQL:
-SELECT SNOWFLAKE.CORTEX.COMPLETE_ANALYST(
-    'casino_host_analyst',
-    'Which players should I offer comps to right now?'
-);
-
-# 6. Run integration tests
-pytest python/tests -v
-```
-
----
-
 ## 📁 Project Structure
 
 ```
 casinohost/
+├── deploy_all.sql             # Single-script deployment (copy/paste to Snowsight)
 ├── sql/
 │   ├── 01_setup/              # Roles, warehouse, schemas, raw tables
 │   ├── 02_data_generation/    # Synthetic data (players, sessions, transactions)
@@ -247,7 +214,6 @@ casinohost/
 │   ├── 05_semantic_model/     # Cortex Analyst YAML + deployment
 │   └── 99_cleanup/            # Teardown scripts
 ├── tools/                      # Cross-platform deployment scripts (.sh + .bat)
-├── python/tests/              # Integration test suite (pytest)
 ├── diagrams/                  # Architecture diagrams (Mermaid)
 ├── docs/                      # User guides (01-SETUP through 05-VALIDATION)
 └── README.md                  # This file
@@ -256,17 +222,6 @@ casinohost/
 ---
 
 ## 🧪 Testing & Validation
-
-### Automated Test Suite (14 tests)
-```bash
-pytest python/tests -v
-```
-
-**Test Coverage:**
-- Data quality validation (row counts, uniqueness, nulls)
-- ML model validation (churn class balance, probability ranges, LTV segments)
-- Cortex Analyst integration (semantic model staging, query execution)
-- End-to-end pipeline (full deployment validation)
 
 ### Industry Benchmark Validation
 Run validation queries from `docs/05-INDUSTRY-VALIDATION.md`:
@@ -367,7 +322,7 @@ By deploying and exploring this demo, you'll learn:
 
 **Demo Owner:** Michael Whitaker (Snowflake Solutions Engineering)  
 **Environment:** SFSENORTHAMERICA-MWHITAKER_AWS  
-**Project Repository:** `/Users/mwhitaker/src/casinohost`
+**GitHub Repository:** https://github.com/sfc-gh-miwhitaker/casinohost
 
 **Related Snowflake Documentation:**
 - [Cortex ML Classification](https://docs.snowflake.com/en/user-guide/ml-powered-classification)

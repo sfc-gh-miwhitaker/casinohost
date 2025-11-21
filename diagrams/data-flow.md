@@ -6,13 +6,13 @@ Status: Reference Impl
 Reference Impl: This code demonstrates prod-grade architectural patterns and best practice. review and customize security, networking, logic for your organization's specific requirements before deployment.
 
 ## Overview
-End-to-end journey of synthetic casino data from Git-integrated deployment through raw generation, staging transformations, analytics modeling, ML feature creation, and Cortex Analyst consumption supporting casino host decisions. Deployment via `sql/00_deploy_all.sql` orchestrates all phases using `EXECUTE IMMEDIATE FROM` Git repository pattern.
+End-to-end journey of synthetic casino data from Git-integrated deployment through raw generation, staging transformations, analytics modeling, ML feature creation, and Cortex Analyst consumption supporting casino host decisions. Deployment via `deploy_all.sql` (project root) orchestrates all phases using `EXECUTE IMMEDIATE FROM` Git repository pattern.
 
 ```mermaid
 graph TB
     subgraph "Deployment"
         GIT_REPO[GitHub Repository<br/>sfc-gh-miwhitaker/casinohost]
-        DEPLOY_SCRIPT[sql/00_deploy_all.sql<br/>Copy/Paste to Snowsight]
+        DEPLOY_SCRIPT[deploy_all.sql<br/>Copy/Paste to Snowsight]
         GIT_STAGE[@GIT_REPOS.CASINOHOST_REPO<br/>EXECUTE IMMEDIATE FROM]
     end
 
@@ -105,10 +105,10 @@ graph TB
   - Location: `https://github.com/sfc-gh-miwhitaker/casinohost`
   - Access: Public, no authentication required
 
-- **sql/00_deploy_all.sql** - Primary deployment script
+- **deploy_all.sql** - Primary deployment script
   - Purpose: Copy/paste into Snowsight for one-click deployment
   - Technology: SQL with Git integration via `EXECUTE IMMEDIATE FROM`
-  - Location: `sql/00_deploy_all.sql` in repository
+  - Location: `deploy_all.sql` in project root
   - Pattern: Creates API integration, Git repo stage, then orchestrates all 30 SQL scripts
   - Runtime: ~35 minutes, ~$0.50 cost
 

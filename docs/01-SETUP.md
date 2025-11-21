@@ -5,45 +5,41 @@ Provision Snowflake prerequisites, local tooling, and security roles required to
 
 ## Prerequisites
 - Snowflake account with `ACCOUNTADMIN` privileges (temporary or sandbox)
-- SnowSQL CLI or Snowsight worksheets for running SQL scripts
-- Git + Python 3.10+ installed locally
+- **Snowsight access** (web interface) - primary deployment method
+- Network access to GitHub for git repository integration
 - Network access to `SNOWFLAKE_EXAMPLE` database (no IP restrictions)
 
 Estimated time: 5 minutes
 
-## Steps
-1. **Clone repository**  
-   ```bash
-   git clone https://github.com/your-org/casinohost.git
-   cd casinohost
-   ```
+## Deployment Method
 
-2. **Configure Python environment**  
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate        # Windows: venv\Scripts\activate
-   pip install -r python/requirements.txt
-   ```
+This demo uses **100% native Snowflake deployment** via Git integration. No local tooling required.
 
-3. **Set Snowflake connectivity**  
-   - Create `config/.env` (copy from `config/.env.example` once added)  
-   - Populate account, username, role, warehouse, database, key pair / password
+### Primary Method: Single-Script Deployment
 
-4. **Generate key pair (optional but recommended)**  
-   ```bash
-   openssl genrsa 2048 | openssl pkcs8 -topk8 -nocrypt -out rsa_key.p8
-   openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub
-   ```
-   Upload public key to target Snowflake user profile.
+1. **Open Snowsight** (your Snowflake web interface)
+2. **Copy** entire `deploy_all.sql` script from GitHub (project root)
+3. **Paste** into new Snowsight worksheet
+4. **Click "Run All"** (top right button)
+5. **Wait ~35 minutes** for automated deployment
 
-5. **Initialize Snowflake roles and warehouse**  
-   Execute `sql/01_setup/01_create_core_objects.sql` as `ACCOUNTADMIN`.
+**That's it!** All infrastructure, data generation, ML models, and Cortex Analyst deploy automatically.
 
-6. **Verify grants**  
+### Alternative: Manual Step-by-Step
+
+If you prefer to execute each component separately:
+
+1. **Initialize Snowflake roles and warehouse**  
+   Execute `sql/01_setup/01_create_core_objects.sql` as `ACCOUNTADMIN`
+
+2. **Verify grants**  
    ```sql
    SHOW GRANTS TO ROLE SFE_CASINO_DEMO_ADMIN;
    SHOW GRANTS TO ROLE CASINO_HOST_ANALYST;
    ```
+
+3. **Proceed to deployment**  
+   See `docs/02-DEPLOYMENT.md` for step-by-step manual deployment
 
 ## Verification
 - `SHOW WAREHOUSES LIKE 'SFE_CASINO_HOST_WH'` returns the demo warehouse  
